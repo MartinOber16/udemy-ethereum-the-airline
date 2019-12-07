@@ -31,10 +31,10 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CarlosLanderas/udemy-ethereum-the-airline.git"
+    "url": ""
   },
   "bugs": {
-    "url": "https://github.com/CarlosLanderas/udemy-ethereum-the-airline/issues"
+    "url": ""
   },
-  "homepage": "https://github.com/CarlosLanderas/udemy-ethereum-the-airline#readme"
+  "homepage": ""
 }
