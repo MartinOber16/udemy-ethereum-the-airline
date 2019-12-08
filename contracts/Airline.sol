@@ -14,6 +14,9 @@ contract Airline {
         uint price;
     }
 
+    // Defino cuanto vale cada punto en ethers
+    uint etherPerPoint = 0.5 ether;
+
     // Listado de vuelos
     Flight[] public flights;
 
@@ -45,4 +48,33 @@ contract Airline {
         emit FlightPurchased(msg.sender, flight.price);
     }
 
+    // Numeros totales de los vuelos que tiene disponibles la aerolinea
+    function totalFlights() public view returns (uint){
+        return flights.length;
+    }
+
+    // Cambiar los puntos por ethers
+    function redeemLoyaltyPoints() public {
+        Customer storage customer = customers[msg.sender];
+        uint etherToRefund = etherPerPoint * customer.loyaltyPoints;
+        msg.sender.transfer(etherToRefund);
+        customer.loyaltyPoints = 0;
+    }
+
+    // Saber cuantos ethers se pueden obtener con los puntos
+    function getRefundableEther() public view returns (uint) {
+        return etherPerPoint * customers[msg.sender].loyaltyPoints;
+    }
+
+
+    // Obtener el balance de la aerolinea
+    function getAirlineBalance() public view returns (uint) {
+        address airlinesAddress = this;
+        return airlinesAddress.balance;
+    }
+
+    modifier isOwner() {
+        require(msg.sender == owner);
+        _;
+    }
 }
