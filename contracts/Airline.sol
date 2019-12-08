@@ -30,8 +30,8 @@ contract Airline {
         owner = msg.sender;
         // Vuelos iniciales
         flights.push(Flight('tokio',4 ether));
-        flights.push(Flight('Germany',1 ether));
-        flights.push(Flight('Madrid',2 ether));
+        flights.push(Flight('Germany',3 ether));
+        flights.push(Flight('Madrid',3 ether));
     }
 
     // Funcion para comprar el vuelo
