@@ -6,7 +6,7 @@ const getWeb3 = () => {
     return new Promise( (resolve, reject) => {
         window.addEventListener('load', function (){
             let web3 = window.web3;
-
+            // se reconstruye para utilizar una version mas actual
             if(typeof web3 !== undefined){
                 web3 = new Web3(web3.currentProvider);
                 resolve(web3);
