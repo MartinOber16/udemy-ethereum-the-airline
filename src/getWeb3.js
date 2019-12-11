@@ -1,5 +1,4 @@
 import Web3 from 'web3';
-import { reject } from 'q';
 
 const getWeb3 = () => {
 

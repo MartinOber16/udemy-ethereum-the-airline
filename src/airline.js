@@ -6,5 +6,6 @@ export default async (provider) => {
     airline.setProvider(provider);
 
     let instance = await airline.deployed();
+    console.log(instance.address);
     return instance;
 }

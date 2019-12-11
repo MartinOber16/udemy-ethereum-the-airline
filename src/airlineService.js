@@ -17,8 +17,28 @@ export class AirlineService {
         return this.mapFlights(flights);
     }
 
+    async getCustomerFlights(account) {
+        let customerTotalFlights = await this.contract.customerTotalFlights(account);
+        let flights = [];
+
+        for(var i = 0; i < customerTotalFlights.toNumber(); i++) {
+            let flight = await this.contract.customerFlights(account,i);
+            flights.push(flight);
+        }
+
+        return this.mapFlights(flights);
+    }
+
     async getTotalFlights() {
         return (await this.contract.totalFlights()).toNumber();
+    }
+
+    getRefundableEther(from) {
+        return this.contract.getRefundableEther({ from });
+    }
+
+    redeemLoyaltyPoints(from) {
+        return this.contract.redeemLoyaltyPoints({ from });
     }
 
     mapFlights(flights) {

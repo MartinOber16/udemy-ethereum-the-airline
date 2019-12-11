@@ -24,7 +24,7 @@ contract Airline {
     mapping(address => Flight[]) public customerFlights; // Relaciona los vuelos de un Cliente por su dirección
     mapping(address => uint) public customerTotalFlights; // Total de los vuelos que ha comprado un cliente
 
-    event FlightPurchased(address indexed customer, uint price); // Evento para cada compra
+    event FlightPurchased(address indexed customer, uint price, string flight); // Evento para cada compra
 
     constructor() public {
         owner = msg.sender;
@@ -45,7 +45,7 @@ contract Airline {
         customerFlights[msg.sender].push(flight);
         customerTotalFlights[msg.sender] ++;
 
-        emit FlightPurchased(msg.sender, flight.price);
+        emit FlightPurchased(msg.sender, flight.price, flight.name);
     }
 
     // Numeros totales de los vuelos que tiene disponibles la aerolinea

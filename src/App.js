@@ -3,6 +3,7 @@ import Panel from "./Panel";
 import getWeb3 from "./getWeb3";
 import AirlineContract from "./airline";
 import {AirlineService} from "./airlineService";
+import { ToastContainer } from "react-toastr";
 
 const converter = (web3) => {
     return (value) => {
@@ -17,7 +18,9 @@ export class App extends Component {
         this.state = {
             account: undefined,
             balance: 0,
-            flights: []
+            flights: [],
+            customerFlights: [],
+            refundableEther: 0
         };
     }
 
@@ -34,6 +37,27 @@ export class App extends Component {
 
         var account = (await this.web3.eth.getAccounts())[0];
         console.log("Cuenta actual: " + account);
+
+        // Subscribirse a un evento
+        let flightPurchased = this.airline.FlightPurchased();
+        flightPurchased.watch(function(err, result) {
+            const {customer, price, flight} = result.args;
+
+            if(customer == this.state.account) {
+                console.log("You purchased a flight to " + flight + " with a cost of " + this.toEther(price) + " eth");
+                this.container.success("You purchased a flight to " + flight + " with a cost of " + this.toEther(price) + " eth", "Flight information");
+            }
+        }.bind(this));
+
+
+        // Metodo de metamask para actualizar cuando hay cambio de cuenta
+        this.web3.currentProvider.publicConfigStore.on('update', async function(event){
+            this.setState({
+                account: event.selectedAddress.toLowerCase()
+            }, () => {
+                this.load();
+            });
+        }.bind(this));
 
         // Guardo en el estado la información de la cuenta y cuando esta lista ejecuto la funcion load
         this.setState({
@@ -57,6 +81,24 @@ export class App extends Component {
         });
     }
 
+    async getRefundableEther() {
+        let refundableEther = this.toEther((await this.AirlineService.getRefundableEther(this.state.account)));
+        this.setState({
+            refundableEther
+        });
+    }
+
+    async refundLoyaltyPoint() {
+        await this.AirlineService.redeemLoyaltyPoints(this.state.account);        
+    }
+
+    async getCustomerFlights() {
+        let customerFlights = await this.AirlineService.getCustomerFlights(this.state.account);
+        this.setState({
+            customerFlights
+        });
+    }
+
     async buyFlight(flightIndex, flight) {
         await this.AirlineService.buyFlight(
             flightIndex, 
@@ -68,6 +110,8 @@ export class App extends Component {
     async load(){
         this.getBalance();
         this.getFlights();
+        this.getCustomerFlights();
+        this.getRefundableEther();
     }
 
     render() {
@@ -85,7 +129,8 @@ export class App extends Component {
                 </div>
                 <div className="col-sm">
                     <Panel title="Loyalty points - refundable ether">
-
+                        <span>{this.state.refundableEther} eth</span>
+                        <button className="btn btn-sm bg-success text-white" onClick={this.refundLoyaltyPoint.bind(this)}>Refund</button>
                     </Panel>
                 </div>
             </div>
@@ -103,10 +148,16 @@ export class App extends Component {
                 </div>
                 <div className="col-sm">
                     <Panel title="Your flights">
-
+                        {this.state.customerFlights.map((flight, i) => {
+                            return <div key={i}>
+                                {flight.name} - cost: {this.toEther(flight.price)}
+                            </div>
+                        })}
                     </Panel>
                 </div>
             </div>
-        </React.Fragment>
+            <ToastContainer ref={(input) => this.container = input}
+                    className="toast-top-right"/>        
+            </React.Fragment>
     }
 }
